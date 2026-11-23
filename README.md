@@ -9,10 +9,9 @@ Requires an Apple silicon Mac on macOS 15 or later.
 Status: all nine algorithm families (12 coins) are ported and pass their tests; the engine, ranking, GPU
 power measurement and app run. Every coin has a pool connection, tested offline against a local test pool
 (real jobs in, each GPU share re-checked with the CPU reference). On Kryptex itself (2026-11-23), XTM, XEL,
-QTC, PRL, RVN, CFX, ERG, ETHW and OCTA have had shares accepted; NEXA and ETC logged in and mined cleanly but
-haven't found a share yet (about one every 9 minutes on an M3 Max), and Quai needs a wallet (Kryptex doesn't pay
-it to accounts). The app asks where earnings go (your Kryptex account or your own wallets) before it starts
-mining.
+QTC, PRL, RVN, CFX, ERG, ETHW, OCTA, NEXA and ETC have had shares accepted: every coin Kryptex pays to accounts.
+Quai needs a wallet, since Kryptex doesn't pay it to accounts yet. The app asks where earnings go (your Kryptex
+account or your own wallets) before it starts mining.
 
 ## Install
 

@@ -151,8 +151,8 @@ and how it uses `client.reconnect`.
 **Live on Kryptex (2026-11-23):** all three accepted a Kryptex account login (`email/worker`) over
 EthereumStratum/1.0.0 with 2-byte extranonces. ETHW (difficulty 0.5, epoch 850 DAG of 7.64 GiB) and OCTA
 (difficulty 4, epoch 360 DAG of 3.81 GiB, which confirms the 30,000-block epochs) each had a share accepted. ETC
-(difficulty 4, about 9 minutes per share at 32 MH/s) mined 8 minutes cleanly without finding a share, so its share
-acceptance is still unconfirmed.
+(difficulty 4, about 9 minutes per share at 32 MH/s; epoch 429 DAG of 4.35 GiB) found none in a first 8-minute run
+and had a share accepted 11 minutes into a longer one.
 
 ## Ideas
 

@@ -151,8 +151,9 @@ Its notify is only seen after a login, so the miner reads both known shapes and 
 
 **Live on Kryptex (2026-11-23):** subscribe returned the MiningCore shape (a 4-byte extranonce, size 4) and the miner
 chose the MiningCore-style notify (4 parameters) with a 4 + 8-byte nonce; a Kryptex account login (`email/worker`)
-was accepted at difficulty 1 (2^32 hashes per share, about 9 minutes at 8 MH/s). Eight minutes found no share, so
-the nonce layout and commitment byte order are still unconfirmed.
+was accepted at difficulty 1 (2^32 hashes per share, about 9 minutes at 8 MH/s). A first 8-minute run found no
+share; a longer run had one accepted after 80 seconds (`mining.submit [login, job, extranonce1, "", nonce]`), which
+confirms the MiningCore-style notify, the 4 + 8-byte nonce and the commitment byte order.
 
 ## Measured (M3 Max 40-core, 2026-11-20; rough, the GPU was shared)
 
