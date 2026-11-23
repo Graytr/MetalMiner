@@ -21,8 +21,9 @@ Requires an Apple silicon Mac (M1 or later) on macOS 15 or later.
 
 ## Install
 
-Download the latest `Metal-Miner-<version>.zip` from [Releases](../../releases), unzip it, and move Metal
-Miner to your Applications folder.
+Download the latest `Metal-Miner-<version>.dmg` from [Releases](../../releases), open it, and drag Metal
+Miner onto the Applications folder next to it. (There's a `.zip` too, if you'd rather: unzip it and move
+Metal Miner to Applications.)
 
 The first releases aren't signed with an Apple Developer ID yet, so the first time you open Metal Miner,
 macOS says it couldn't verify the app is free of malware. To open it anyway:
