@@ -1,0 +1,10 @@
+# Build output
+.build/
+# Personal settings (payout username or wallet addresses, electricity price)
+settings.json
+# Local benchmark, ranking and earnings files
+results/
+.DS_Store
+
+# Release zips
+dist/
