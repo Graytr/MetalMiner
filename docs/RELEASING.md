@@ -33,6 +33,13 @@ the device.
    set the default branch to `develop` (Settings → General → Default branch). A private repository's
    releases can only be downloaded by people you give access to; make it public when it's for everyone.
 
+## Releasing before there's a Developer ID
+
+`./release.sh` without `DEVELOPER_ID` makes the same zip with an ad-hoc signature. It runs on any Apple
+silicon Mac, but macOS warns the first time it's opened, and people have to allow it once (README,
+Install). Publish it as a pre-release. When the certificate arrives, build the same tag signed and
+notarized, and replace the zip on that release.
+
 ## Branches
 
 - `master`: released versions only, each tagged (`v0.1.0`, ...).

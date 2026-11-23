@@ -22,8 +22,18 @@ Requires an Apple silicon Mac (M1 or later) on macOS 15 or later.
 ## Install
 
 Download the latest `Metal-Miner-<version>.zip` from [Releases](../../releases), unzip it, and move Metal
-Miner to your Applications folder. Releases are signed with a Developer ID and notarized by Apple, so they
-open like any other app.
+Miner to your Applications folder.
+
+The first releases aren't signed with an Apple Developer ID yet, so the first time you open Metal Miner,
+macOS says it couldn't verify the app is free of malware. To open it anyway:
+
+1. Click **Done** in that message.
+2. Open **System Settings → Privacy & Security**, scroll down to **Security**, and click **Open Anyway**
+   next to the note that Metal Miner was blocked.
+3. Confirm with your password or Touch ID, then click **Open Anyway** once more.
+
+macOS remembers your choice, and Metal Miner opens normally from then on. If you'd rather not, build it
+yourself (see Build from source below). Signed releases will open without the warning.
 
 Metal Miner isn't in the Mac App Store: Apple's rules don't allow apps that mine cryptocurrency on the device
 (App Review Guideline 3.1.5(ii)).
