@@ -351,10 +351,10 @@ public final class MinerEngine: @unchecked Sendable {
             lastTick = now()
             let earnings: [EarningsRow]? = locked {
                 guard let option = active, case .mining = snap.state else { return nil }
-                var row = ledger[option.id] ?? EarningsRow(algorithm: option.algorithm, coin: option.coin, seconds: 0,
+                var row = ledger[Self.ledgerKey(option)] ?? EarningsRow(algorithm: option.algorithm, coin: option.coin, seconds: 0,
                                                           estimatedUSD: 0, acceptedShares: 0)
                 row.seconds += elapsed
-                ledger[option.id] = row
+                ledger[Self.ledgerKey(option)] = row
                 return Self.sorted(ledger)
             }
             publish { s in
@@ -487,13 +487,13 @@ public final class MinerEngine: @unchecked Sendable {
     private func recordShare(_ option: CoinOption, accepted: Bool, work: Double, note: String?) {
         let value = accepted && option.rate > 0 ? work * option.usdPerDay / option.rate / 86_400 : 0
         let rows: [EarningsRow] = locked {
-            var row = ledger[option.id] ?? EarningsRow(algorithm: option.algorithm, coin: option.coin, seconds: 0,
+            var row = ledger[Self.ledgerKey(option)] ?? EarningsRow(algorithm: option.algorithm, coin: option.coin, seconds: 0,
                                                       estimatedUSD: 0, acceptedShares: 0)
             if accepted {
                 row.acceptedShares += 1
                 row.estimatedUSD += value
             }
-            ledger[option.id] = row
+            ledger[Self.ledgerKey(option)] = row
             return Self.sorted(ledger)
         }
         publish { s in
@@ -508,10 +508,17 @@ public final class MinerEngine: @unchecked Sendable {
 
     // MARK: Ledgers
 
-    private static func loadLedger(at url: URL) -> [String: EarningsRow] {
+    /// A saved ledger, one row per coin. Rows saved twice for one coin (by earlier builds) are added together.
+    static func loadLedger(at url: URL) -> [String: EarningsRow] {
         guard let data = try? Data(contentsOf: url), let rows = try? JSONDecoder().decode([EarningsRow].self, from: data) else { return [:] }
-        return Dictionary(rows.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        return Dictionary(rows.map { ($0.id, $0) }, uniquingKeysWith: { a, b in
+            EarningsRow(algorithm: a.algorithm, coin: a.coin, seconds: a.seconds + b.seconds,
+                        estimatedUSD: a.estimatedUSD + b.estimatedUSD, acceptedShares: a.acceptedShares + b.acceptedShares)
+        })
     }
+
+    /// A coin's key in the ledger: its earnings row's id, so a saved ledger reads back under the same keys.
+    static func ledgerKey(_ option: CoinOption) -> String { "\(option.algorithm)/\(option.coin)" }
 
     private static func sorted(_ ledger: [String: EarningsRow]) -> [EarningsRow] {
         ledger.values.sorted { $0.estimatedUSD > $1.estimatedUSD }

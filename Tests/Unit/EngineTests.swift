@@ -78,5 +78,23 @@ enum EngineTests {
             expect.equal(choice.reason, "nothing earns more than its electricity")
             expect.equal(MinerEngine.choose(options, mineOnlyWhenProfitable: false).option?.coin, "XTM")
         }),
+        ("new mining time goes to the row a saved ledger reads back as", { expect in
+            let option = MinerEngine.options([row("XTM", pool: "xtm-c29", usd: 0.45)], account(), refused: [:])[0]
+            let saved = EarningsRow(algorithm: option.algorithm, coin: option.coin, seconds: 1, estimatedUSD: 0, acceptedShares: 0)
+            expect.equal(MinerEngine.ledgerKey(option), saved.id)
+        }),
+        ("a ledger saved with a coin twice loads as one row with the totals added", { expect in
+            let url = try MinerPaths.data().appendingPathComponent("ledger-duplicates.json")
+            try JSONEncoder().encode([
+                EarningsRow(algorithm: "cuckaroo29", coin: "XTM", seconds: 60, estimatedUSD: 0.01, acceptedShares: 1),
+                EarningsRow(algorithm: "cuckaroo29", coin: "XTM", seconds: 90, estimatedUSD: 0.02, acceptedShares: 2),
+                EarningsRow(algorithm: "kawpow", coin: "RVN", seconds: 30, estimatedUSD: 0, acceptedShares: 0),
+            ]).write(to: url)
+            let ledger = MinerEngine.loadLedger(at: url)
+            expect.equal(ledger.count, 2)
+            expect.equal(ledger["cuckaroo29/XTM"]?.seconds, 150)
+            expect.equal(ledger["cuckaroo29/XTM"]?.acceptedShares, 3)
+            expect.near(ledger["cuckaroo29/XTM"]?.estimatedUSD ?? 0, 0.03, within: 1e-12)
+        }),
     ])
 }
