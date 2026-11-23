@@ -47,9 +47,9 @@ struct ContentView: View {
 
     private var header: some View {
         HStack(spacing: 12) {
-            Image(systemName: "cube.transparent")
-                .font(.system(size: 30, weight: .medium))
-                .foregroundStyle(.tint)
+            Image(nsImage: NSApplication.shared.applicationIconImage)
+                .resizable()
+                .frame(width: 52, height: 52)
             VStack(alignment: .leading, spacing: 2) {
                 Text("Metal Miner").font(.title.bold())
                 Text(statusLine).foregroundStyle(.secondary).lineLimit(1)
