@@ -25,7 +25,7 @@ the device.
 4. **The GitHub repository.** Create an empty repository on github.com (no README, license or .gitignore:
    the project has its own), then push both long-lived branches:
 
-       git remote add origin https://github.com/YOUR-NAME/metal-miner.git
+       git remote add origin https://github.com/YOUR-NAME/MetalMiner.git
        git push -u origin master develop
 
    GitHub asks you to sign in on the first push: with HTTPS, use a personal access token as the password,
