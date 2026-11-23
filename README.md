@@ -26,6 +26,8 @@ Guideline 3.1.5(ii)). `release.sh` builds a release; its header lists the signin
     ./build.sh                                        # -> .build/all/metalminer and .build/all/Metal Miner.app
     open ".build/all/Metal Miner.app"                 # the app: GPUs, Start Mining, best coins, earnings
     .build/all/metalminer info                        # GPUs, memory limits, GPU power now
+    ./test.sh                                         # unit tests: offline, no GPU, under a minute or two
+    ./test.sh --gpu                                   # plus every algorithm and pool connection on the GPU
     .build/all/metalminer test all                    # official vectors + GPU/CPU cross-check
     .build/all/metalminer bench all --seconds 30 --cooldown 30
     .build/all/metalminer rank                        # live Kryptex data; electricity free unless set

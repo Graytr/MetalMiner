@@ -9,6 +9,7 @@
 #   ./build.sh                   every algorithm folder, CLI and app   -> .build/all/
 #   ./build.sh Ethash KawPow     just those folders, CLI only          -> .build/Ethash+KawPow/metalminer
 #   ./build.sh --app Ethash      those folders, CLI and app
+#   ./build.sh --tests           also the unit-test runner, .build/<name>/metalminer-tests (./test.sh runs it)
 set -euo pipefail
 ROOT="${0:A:h}"
 DEV="$(xcode-select -p)"
@@ -16,9 +17,14 @@ TC="$DEV/Toolchains/XcodeDefault.xctoolchain/usr/bin"
 SDK="$DEV/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
 
 APP=0
+TESTS=0
 ALGOS=()
 for arg in "$@"; do
-  if [[ "$arg" == "--app" ]]; then APP=1; else ALGOS+=("$arg"); fi
+  case "$arg" in
+    --app) APP=1 ;;
+    --tests) TESTS=1 ;;
+    *) ALGOS+=("$arg") ;;
+  esac
 done
 if (( ${#ALGOS} )); then
   NAME="${(j:+:)ALGOS}"
@@ -32,7 +38,8 @@ OUT="$ROOT/.build/$NAME"
 mkdir -p "$OUT/tmp" "$OUT/ModuleCache" "$OUT/modules"
 export TMPDIR="$OUT/tmp" SDKROOT="$SDK" CLANG_MODULE_CACHE_PATH="$OUT/ModuleCache"
 # Apple silicon only (the kernels assume its 32-wide SIMD groups), macOS 15 or later (every Apple silicon Mac runs it).
-SWIFTC=("$TC/swiftc" -swift-version 5 -O -target arm64-apple-macos15.0 -sdk "$SDK" -module-cache-path "$OUT/ModuleCache")
+SWIFTC_BASE=("$TC/swiftc" -swift-version 5 -target arm64-apple-macos15.0 -sdk "$SDK" -module-cache-path "$OUT/ModuleCache")
+SWIFTC=("${SWIFTC_BASE[@]}" -O)
 
 CORE=("$ROOT"/Sources/Harness/*.swift "$ROOT"/Sources/Engine/*.swift(N))
 for a in "${ALGOS[@]}"; do
@@ -79,5 +86,10 @@ if (( APP )); then
   # Ad-hoc signature so it runs on this Mac; releases need a Developer ID signature and notarization.
   /usr/bin/codesign --force --sign - "$BUNDLE" >/dev/null 2>&1
   BUILT="$BUILT and .build/$NAME/Metal Miner.app"
+fi
+if (( TESTS )); then
+  # The core sources and Tests/ as one module, so tests reach internal code; unoptimized, as it only checks logic.
+  "${SWIFTC_BASE[@]}" -Onone -module-name MinerTests -o "$OUT/metalminer-tests" "${CORE[@]}" "$ROOT"/Tests/**/*.swift(N)
+  BUILT="$BUILT and .build/$NAME/metalminer-tests"
 fi
 print "built $BUILT (${#ALGOS} algorithm folder(s)${ALGOS:+: ${ALGOS[*]}})"
