@@ -277,11 +277,14 @@ public final class MinerEngine: @unchecked Sendable {
 
     // MARK: Choosing
 
-    /// The coin to mine: the best one the engine can mine (`CoinOption.canMine`). nil, with a reason, when there are
-    /// no prices yet, nothing can be mined, or (under "mine only when profitable") the pick doesn't pay for its
-    /// electricity.
     private func chooseUnlocked() -> (option: CoinOption?, reason: String?) {
-        let options = snap.options
+        Self.choose(snap.options, mineOnlyWhenProfitable: currentSettings.mineOnlyWhenProfitable)
+    }
+
+    /// The coin to mine from `options` (best first): the best one the engine can mine (`CoinOption.canMine`). nil,
+    /// with a reason, when there are no prices yet, nothing can be mined, or (under "mine only when profitable") the
+    /// pick doesn't pay for its electricity.
+    static func choose(_ options: [CoinOption], mineOnlyWhenProfitable: Bool) -> (option: CoinOption?, reason: String?) {
         guard !options.isEmpty else { return (nil, "no benchmark results yet") }
         guard let pick = options.first(where: \.canMine) else {
             if !options.contains(where: \.hasPoolConnection) { return (nil, "this build has no pool connections") }
@@ -290,7 +293,7 @@ public final class MinerEngine: @unchecked Sendable {
             }
             return (nil, "the pool refused the login; check the payout in Settings")
         }
-        if currentSettings.mineOnlyWhenProfitable, pick.score <= 0 {
+        if mineOnlyWhenProfitable, pick.score <= 0 {
             return (nil, "nothing earns more than its electricity")
         }
         return (pick, nil)

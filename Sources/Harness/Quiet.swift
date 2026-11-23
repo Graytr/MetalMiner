@@ -41,6 +41,12 @@ final class QuietController {
     /// The fans' level at the last check; nil before the first, which only notes where they are.
     private var lastLevel: Double?
     private var quietSince: Double?
+    private let readFans: () -> [FanSensor.Fan]?
+
+    /// `readFans` gives the fans' speeds, or nil on a Mac whose fans can't be read (tests pass their own).
+    init(readFans: @escaping () -> [FanSensor.Fan]? = { FanSensor.shared?.read() }) {
+        self.readFans = readFans
+    }
 
     /// `gpuWatts` is the GPU's average power since the last tick.
     func tick(gpuWatts: Double?, at time: Double = now()) {
@@ -50,11 +56,10 @@ final class QuietController {
         }
         guard time - lastCheck >= 20 else { return }   // fans and heat change slowly: re-aim every 20 s
         lastCheck = time
-        guard let sensor = FanSensor.shared else {
+        guard let fans = readFans() else {
             if ProcessInfo.processInfo.thermalState != .nominal { targetWatts = max(3, targetWatts * 0.85) }
             return
         }
-        let fans = sensor.read()
         fanRPM = fans.map(\.rpm)
         let level = FanSensor.level(fans)
         defer { lastLevel = level }
