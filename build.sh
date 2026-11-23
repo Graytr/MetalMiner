@@ -35,6 +35,10 @@ else
 fi
 
 OUT="$ROOT/.build/$NAME"
+if (( APP )) && /usr/bin/pgrep -f "$OUT/Metal Miner.app/Contents/MacOS/MetalMiner" >/dev/null; then
+  print -u2 "Metal Miner is running from .build/$NAME; quit it first, since this rebuilds that app"
+  exit 1
+fi
 mkdir -p "$OUT/tmp" "$OUT/ModuleCache" "$OUT/modules"
 export TMPDIR="$OUT/tmp" SDKROOT="$SDK" CLANG_MODULE_CACHE_PATH="$OUT/ModuleCache"
 # Apple silicon only (the kernels assume its 32-wide SIMD groups), macOS 15 or later (every Apple silicon Mac runs it).

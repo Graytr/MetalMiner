@@ -1,8 +1,8 @@
 # Releasing Metal Miner
 
-A release is a zip of the app, signed with a Developer ID, notarized by Apple, and attached to a GitHub
-release. The Mac App Store isn't an option: App Review Guideline 3.1.5(ii) doesn't allow apps that mine on
-the device.
+A release is the app in a disk image (it opens to the app next to a shortcut to Applications, to drag it
+onto) and a zip, both signed with a Developer ID, notarized by Apple, and attached to a GitHub release. The
+Mac App Store isn't an option: App Review Guideline 3.1.5(ii) doesn't allow apps that mine on the device.
 
 ## One-time setup
 
@@ -35,10 +35,10 @@ the device.
 
 ## Releasing before there's a Developer ID
 
-`./release.sh` without `DEVELOPER_ID` makes the same zip with an ad-hoc signature. It runs on any Apple
-silicon Mac, but macOS warns the first time it's opened, and people have to allow it once (README,
-Install). Publish it as a pre-release. When the certificate arrives, build the same tag signed and
-notarized, and replace the zip on that release.
+`./release.sh` without `DEVELOPER_ID` makes the same disk image and zip with an ad-hoc signature.
+It runs on any Apple silicon Mac, but macOS warns the first time it's opened, and people have to allow it
+once (README, Install). Publish it as a pre-release. When the certificate arrives, build the same tag
+signed and notarized, and replace both files on that release.
 
 ## Branches
 
@@ -59,17 +59,18 @@ notarized, and replace the zip on that release.
        git merge --no-ff develop -m "Release 0.1.0"
        git tag -a v0.1.0 -m "Metal Miner 0.1.0"
 
-3. Build, sign, notarize and staple, from `master`. Apple's check usually takes a few minutes:
+3. Build, sign, notarize and staple, from `master`, with Metal Miner quit (the release rebuilds the app in
+   `.build/all`). Apple checks the app and then the disk image, a few minutes each:
 
        DEVELOPER_ID="Developer ID Application: Your Name (TEAMID)" NOTARY_PROFILE=metalminer ./release.sh
 
-   This leaves `dist/Metal-Miner-<version>.zip`. If notarization fails, `xcrun notarytool log <id>
+   This leaves `dist/Metal-Miner-<version>.dmg` and `.zip`. If notarization fails, `xcrun notarytool log <id>
    --keychain-profile metalminer` says why.
-4. Check it the way a user gets it: unzip the zip somewhere new and open the app. macOS should open it
-   without a warning, and `spctl -a -t exec -vv "Metal Miner.app"` should say
+4. Check it the way a user gets it: open the disk image, drag the app somewhere new and open it. macOS
+   should open it without a warning, and `spctl -a -t exec -vv "Metal Miner.app"` should say
    `source=Notarized Developer ID`.
-5. Publish: push the branches and the tag, then on GitHub draft a release from the tag, attach the zip,
-   and write what changed.
+5. Publish: push the branches and the tag, then on GitHub draft a release from the tag, attach the disk
+   image and the zip, and write what changed.
 
        git push origin master develop --tags
 
