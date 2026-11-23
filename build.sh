@@ -77,7 +77,7 @@ if (( APP )); then
     case "${k:t}" in *_lab.metal|*_prof.metal) ;; *) cp "$k" "$BUNDLE/Contents/Resources/Kernels/" ;; esac
   done
   ICON="$OUT/AppIcon.icns"
-  if [[ ! -f "$ICON" ]]; then   # drawn once by Sources/Tools/MakeIcon.swift
+  if [[ ! -f "$ICON" || "$ROOT/Sources/Tools/MakeIcon.swift" -nt "$ICON" ]]; then   # drawn by Sources/Tools/MakeIcon.swift
     "${SWIFTC[@]}" -o "$OUT/make-icon" "$ROOT/Sources/Tools/MakeIcon.swift"
     "$OUT/make-icon" "$OUT/AppIcon.iconset"
     /usr/bin/iconutil -c icns -o "$ICON" "$OUT/AppIcon.iconset"
